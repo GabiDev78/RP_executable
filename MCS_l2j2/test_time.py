@@ -480,7 +480,7 @@ def main_mcs(fich):
 
 
 def main():
-    for i in range(3,6):
+    for i in range(4,6):
         if i == 1:
             for j in range(1, 10):
                 fichier = "data_files/"+str(j)+".txt"
@@ -509,29 +509,29 @@ def main():
                     file3.write("mcs n13"+" "+str(x)+" "+str(y)+"\n")
                 file3.close()
         elif i == 4:
-            for j in range(0, 9):
+            for j in range(2, 10):
                 fichier = "data_files/14/"+str(j)+"guillotine.txt"
                 file4 = open("tests_temps14_pb"+str(j)+"guillotine.txt", "w")
                 file4.write("Fonction temps densité\n")
-                for n in range(0, 10):
+                for n in range(0, 5):
                     x, y = main_mcs(fichier)
                     file4.write("mcs n12"+" "+str(x)+" "+str(y)+"\n")
                 file4.close()
         elif i == 5:
-            for j in range(0, 9):
+            for j in range(0, 10):
                 fichier = "data_files/15/"+str(j)+"guillotine.txt"
                 file5 = open("tests_temps15_pb"+str(j)+"guillotine.txt", "w")
                 file5.write("Fonction  temps densité\n")
-                for n in range(0, 10):
+                for n in range(0, 15):
                     x, y = main_mcs(fichier)
                     file5.write("mcs n15"+" "+str(x)+" "+str(y)+"\n")
                 file5.close()
         elif i == 6:
-            for j in range(0, 9):
+            for j in range(0, 10):
                 fichier = "data_files/16/"+str(j)+"guillotine.txt"
                 file6 = open("tests_temps16_pb"+str(j)+"guillotine.txt", "w")
                 file6.write("Fonction  temps densité\n")
-                for n in range(0, 10):
+                for n in range(0, 15):
                     x, y = main_mcs(fichier)
                     file6.write("mcs n16"+" "+str(x)+" "+str(y)+"\n")
                 file6.close()
