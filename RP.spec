@@ -21,7 +21,7 @@ block_cipher = None
 
 a = Analysis(
     ['RP.py'],
-    pathex=['/Users/gabriel/Desktop/RP_exe_mac/'],
+    pathex=[r"C:\Users\Gabi\Desktop\RP_executable"],
     binaries=[],
     datas=txt_files,
     hiddenimports=[],

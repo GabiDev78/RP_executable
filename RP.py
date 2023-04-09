@@ -189,6 +189,7 @@ def main_player():
             a, b = [int(i) for i in line.split()]
             small_rectangles.append(Rectangle(0, 0, a, b))
     while len(small_rectangles)!=0:
+        os.system('cls' if os.name == 'nt' else 'clear')
         length_sr = len(small_rectangles)
         print(" Taille Grand Rectangle (hauteur x largeur): "+ str(g.m)+"x"+str(g.n))
         print(g)
@@ -231,26 +232,7 @@ def main_player():
 
 def main_random():
     #Choisi un probleme au hasard parmis 3 fichiers
-    fichint = random.randint(1,10)
-    doss = random.randint(1,6)
-    if doss == 1:
-        print('data_files', str(fichint)+".txt")
-        fichier = get_resource_path(os.path.join('data_files', str(fichint)+".txt"))
-    elif doss == 2:
-        print('data_files/12/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/12/', str(fichint)+"guillotine.txt"))
-    elif doss == 3:
-        print('data_files/13/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/13/', str(fichint)+"guillotine.txt"))
-    elif doss == 4:
-        print('data_files/14/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/14/', str(fichint)+"guillotine.txt"))
-    elif doss == 5:
-        print('data_files/15/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/15/', str(fichint)+"guillotine.txt"))
-    elif doss == 6:
-        print('data_files/16/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/16/', str(fichint)+"guillotine.txt"))
+    fichier, namefich = choosefile()
     small_rectangles = []
     small_rectangles_place = []
     with open(fichier) as f: #On recupere les valeurs du fichiers pour creer les objets pour les probleme
@@ -278,24 +260,12 @@ def main_random():
     del small_rectangles[len_sm-1]
     n = 0
     while len(small_rectangles)!=0 and n<100:
+        os.system('cls' if os.name == 'nt' else 'clear')
         len_sm = len(small_rectangles)
         print(g)
         choserect = random.randint(0, len_sm-1)  #On choisit un petit rectangle au hasard à placer
         rect = small_rectangles[choserect]
-        for i in range(0, xlen): #Pour chaques case dans Grid, on verifie si la case est pas un certain type de coin
-            for y in range(0,ylen): #On verifie aussi si le coin n'existe pas deja dans la liste correspondante
-                if g.coinHG(i, y) == True:
-                    if (i, y) not in list_coinHG: 
-                        list_coinHG.append((i, y))
-                if g.coinHD(i, y) == True:
-                    if (i, y) not in list_coinHD: 
-                        list_coinHD.append((i, y))
-                if g.coinBG(i, y) == True:
-                    if (i, y) not in list_coinBG: 
-                        list_coinBG.append((i, y))
-                if g.coinBD(i, y) == True:
-                    if (i, y) not in list_coinBD: 
-                        list_coinBD.append((i, y))
+        list_coinHG, list_coinBG, list_coinHD, list_coinBD = getCoins(g)
         nbpos = 0
         sm = rect
         if n < 25: #Ici, on teste 25 fois les differents coins hauts gauches pour chaque rectangle si c'est possible de le placer
@@ -349,8 +319,8 @@ def main_random():
         print("C'est réussi, il reste aucun rectangle à placer")
     else :
         print("C'est raté, il reste "+str(len(small_rectangles))+" rectangle(s) à placer")
-    print("densité totale :", end= " ")
-    g.CalcDensity()
+    print("densité totale  %s:" % g.CalcDensity(), end= " ")
+    return namefich
 
 def random_placement(small_rectangles ,big_rectangle, g, small_rectangles_place):
     if g.CalcDensity() == 100.0 or len(small_rectangles)==0:
@@ -369,20 +339,7 @@ def random_placement(small_rectangles ,big_rectangle, g, small_rectangles_place)
             len_sm = len(small_rectangles)
             choserect = random.randint(0, len_sm-1)  #On choisit un petit rectangle au hasard à placer
             rect = small_rectangles[choserect]
-            for i in range(0, xlen): #Pour chaques case dans Grid, on verifie si la case est pas un certain type de coin
-                for y in range(0,ylen): #On verifie aussi si le coin n'existe pas deja dans la liste correspondante
-                    if g.coinHG(i, y) == True:
-                        if (i, y) not in list_coinHG: 
-                            list_coinHG.append((i, y))
-                    if g.coinHD(i, y) == True:
-                        if (i, y) not in list_coinHD: 
-                            list_coinHD.append((i, y))
-                    if g.coinBG(i, y) == True:
-                        if (i, y) not in list_coinBG: 
-                            list_coinBG.append((i, y))
-                    if g.coinBD(i, y) == True:
-                        if (i, y) not in list_coinBD: 
-                            list_coinBD.append((i, y))
+            list_coinHG, list_coinBG, list_coinHD, list_coinBD = getCoins(g)
             nbpos = 0
             sm = rect
             if n < 25 and list_coinHG: #Ici, on teste 25 fois les differents coins hauts gauches pour chaque rectangle si c'est possible de le placer
@@ -445,6 +402,12 @@ def simulate(sim, rect, n, coin_HG, coin_HD, coin_BG, coin_BD, remaining_rectang
         y, x = pos
         x = x - temp_rect.height + 1
         y = y - temp_rect.width + 1
+    else:
+        return None, None
+
+
+    if not coin_BD and not coin_BG and not coin_HD and not coin_HG:
+        return None, None
 
     remaining_rectangles_temp = copy.deepcopy(remaining_rectangles)
 
@@ -469,7 +432,6 @@ def simulate(sim, rect, n, coin_HG, coin_HD, coin_BG, coin_BD, remaining_rectang
 
 
 def dfs(rectangles, big_rectangle, rectangles_placed, grid, placed_indices):
-    print(grid)
     # test fin récursion : tous lres rectangles ont été placé
     if len(rectangles_placed) == len(rectangles):
         return True
@@ -477,6 +439,8 @@ def dfs(rectangles, big_rectangle, rectangles_placed, grid, placed_indices):
     # boucle qui test chaque rectangle non placé pour chaque appel récursif
     for l, rectangle in enumerate(rectangles):
         if l not in placed_indices:
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print(grid)
             # On essaye de poser le rectangle dans chaque position de la grille possible
             for i in range(grid.m):
                 for j in range(grid.n):
@@ -506,26 +470,7 @@ def dfs(rectangles, big_rectangle, rectangles_placed, grid, placed_indices):
 
 
 def main_dfs():
-    fichint = random.randint(1,10)
-    doss = random.randint(1,6)
-    if doss == 1:
-        print('data_files', str(fichint)+".txt")
-        fichier = get_resource_path(os.path.join('data_files', str(fichint)+".txt"))
-    elif doss == 2:
-        print('data_files/12/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/12/', str(fichint)+"guillotine.txt"))
-    elif doss == 3:
-        print('data_files/13/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/13/', str(fichint)+"guillotine.txt"))
-    elif doss == 4:
-        print('data_files/14/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/14/', str(fichint)+"guillotine.txt"))
-    elif doss == 5:
-        print('data_files/15/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/15/', str(fichint)+"guillotine.txt"))
-    elif doss == 6:
-        print('data_files/16/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/16/', str(fichint)+"guillotine.txt"))
+    fichier, namefich = choosefile()
     small_rectangles = []
     small_rectangles_place = []
     placed_indices = []
@@ -542,14 +487,13 @@ def main_dfs():
         print("reussite !")
         print("")
         print(g)
-        print("densité totale :", end= " ")
-        g.CalcDensity()
+        print("densité totale : %s" % g.CalcDensity())
     else:
         print("raté !")
         print(g)
-        print("densité totale :", end= " ")
-        g.CalcDensity()
-    return None
+        print("densité totale : %s" % g.CalcDensity())
+    return namefich
+
 
 def mcs(rectangles, big_rectangle, grid, n):
     print("La résolution du problème a commencé, cela peut prendre du temps !")
@@ -559,11 +503,13 @@ def mcs(rectangles, big_rectangle, grid, n):
     current_grid = grid.copy()
 
     while len(remaining_rectangles) != 0:
-        print("* ", end="")
+        print("* ", end="")        
         densities = defaultdict(list)
         coin_HG, coin_BG, coin_HD, coin_BD = [], [], [], []
 
         for i, rect in enumerate(remaining_rectangles):
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print(current_grid)
             coin_HG, coin_BG, coin_HD, coin_BD = getCoins(current_grid)
 
             with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -597,26 +543,7 @@ def get_resource_path(relative_path):
 
 
 def main_mcs():
-    fichint = random.randint(1,10)
-    doss = random.randint(1,6)
-    if doss == 1:
-        print('data_files', str(fichint)+".txt")
-        fichier = get_resource_path(os.path.join('data_files', str(fichint)+".txt"))
-    elif doss == 2:
-        print('data_files/12/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/12/', str(fichint)+"guillotine.txt"))
-    elif doss == 3:
-        print('data_files/13/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/13/', str(fichint)+"guillotine.txt"))
-    elif doss == 4:
-        print('data_files/14/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/14/', str(fichint)+"guillotine.txt"))
-    elif doss == 5:
-        print('data_files/15/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/15/', str(fichint)+"guillotine.txt"))
-    elif doss == 6:
-        print('data_files/16/', str(fichint)+"guillotine.txt")
-        fichier = get_resource_path(os.path.join('data_files/16/', str(fichint)+"guillotine.txt"))
+    fichier, namefich = choosefile()
     small_rectangles = []
     try:
         with open(fichier) as f:
@@ -637,43 +564,106 @@ def main_mcs():
                 g2.update_by_rect(rect.y, rect.x, rect.height, rect.width, i+1)
                 print(g2)
             print("densité finale : "+ str(c))
-            print("Effectué en %s secondes :" % end_time)
+            print("Problème : "+namefich+" effectué en %s secondes :" % end_time)
             print("")
     except Exception as e:
         print("Error:", e)
 
 
+def choosefile():
+    doss = random.randint(1,6)
+    namefich = None
+    if doss == 1:
+        fichint = random.randint(1,10)
+        print('data_files', str(fichint)+".txt")
+        fichier = get_resource_path(os.path.join('data_files/', str(fichint)+".txt"))
+        namefich = 'data_files'+str(fichint)+".txt"
+    elif doss == 2:
+        fichint = random.randint(0,9)
+        print('data_files/12/', str(fichint)+"guillotine.txt")
+        fichier = get_resource_path(os.path.join('data_files/12/', str(fichint)+"guillotine.txt"))
+        namefich = 'data_files/12/'+str(fichint)+".txt"
+    elif doss == 3:
+        fichint = random.randint(0,9)
+        print('data_files/13/', str(fichint)+"guillotine.txt")
+        fichier = get_resource_path(os.path.join('data_files/13/', str(fichint)+"guillotine.txt"))
+        namefich = 'data_files/13/'+str(fichint)+".txt"
+    elif doss == 4:
+        fichint = random.randint(0,9)
+        print('data_files/14/', str(fichint)+"guillotine.txt")
+        fichier = get_resource_path(os.path.join('data_files/14/', str(fichint)+"guillotine.txt"))
+        namefich = 'data_files/14/'+str(fichint)+".txt"
+    elif doss == 5:
+        fichint = random.randint(0,9)
+        print('data_files/15/', str(fichint)+"guillotine.txt")
+        fichier = get_resource_path(os.path.join('data_files/15/', str(fichint)+"guillotine.txt"))
+        namefich = 'data_files/15/'+str(fichint)+".txt"
+    elif doss == 6:
+        fichint = random.randint(0,9)
+        print('data_files/16/', str(fichint)+"guillotine.txt")
+        fichier = get_resource_path(os.path.join('data_files/16/', str(fichint)+"guillotine.txt"))
+        namefich = 'data_files/16/'+str(fichint)+".txt"
+    return fichier, namefich
+
 def main():
-        x = int(input("Tapez 1 pour résoudre un probème vous même ou 2 pour un problème aléatoire par l'ordinateur Random ou 3 pour dfs ou 4 pour mcs: "))
-        while x<1 or x>4:
-            print("Vous n'avez pas tapé un entier entre 1 et 2")
-            x = int(input("Tapez 1 pour résoudre un probème vous même ou 2 pour un problème aléatoire par l'ordinateur Random : "))
-        if x==1:
-            if messagebox.askyesno("Regles RP", "Voulez lire les règles du RP ?")==True:
-                messagebox.showinfo("Regles :", """Règles du Rectangle Packing
-
-Le but est de placer plusieurs "petits" rectangles dans un plus grand rectangle appelé la BOX, tout cela sans chevauchement. 
-Si l'on souhaite que la BOX soit 100% remplie des petits rectangles, alors on dit que l'on cherche un Perfect Rectangle Packing.
-
-Premierement, pour connaitre le probleme que vous allez resoudre, vous en choisirez un parmis une base de problème créée.
-Puis vous entrerez des coordonnees pour chaque rectangle à placer, elles feront références à la position du coin haut gauche de ce petit rectangle.
-Le x fait référence à l'axe des abscisses (l'axe L), et le y lui à l'axe des ordonnées (l'axe H).
-
-Bonne chance !""")
+    print("\t******** Menu Principal ********\n")
+    print("\t      1 ==> Joueur Humain")
+    print("\t      2 ==> Joueur Aléatoire")
+    print("\t      3 ==> Joueur DFS")
+    print("\t      4 ==> Joueur MCS")
+    print("\t      5 ==> Règles et Infos\n")
+    while True :
+            try :
+                    x = int(input("    Tapez un nombre : "))
+                    break
+            except ValueError :
+                    print("\t!!!!Vous n'avez pas tapé un entier!!!!")
+    while x<1 or x>5:
+            print("\t!!!!Vous n'avez pas tapé un entier entre 1 et 5!!!!")
+            while True :
+                    try :
+                            x = int(input("    Tapez un nombre : "))
+                            break
+                    except ValueError :
+                            print("!!!!Vous n'avez pas tapé un entier!!!!")
+    if x==1:
+            start_time = time.time()
             main_player()
-        if x==2:
+            print("    Problème résolu en %s secondes :" % (time.time() - start_time))
+            
+    if x==2:
             start_time = time.time()
             main_random()
-            print("Effectué en %s secondes :" % (time.time() - start_time))
-        if x==3:
+            print("    Problème résolu en %s secondes :" % (time.time() - start_time))
+    if x==3 :
             start_time = time.time()
             main_dfs()
-            print("Effectué en %s secondes :" % (time.time() - start_time))
-        if x==4:
-            main_mcs()
+            print("    Problème résolu en %s secondes :" % (time.time() - start_time))
+    if x==4 :
+        start_time = time.time()
+        main_mcs()
+    if x==5 :
+            messagebox.showinfo("Règles : ", """Règles   
 
+    Le but du Rectangle Packing est de placer plusieurs "petits" rectangles dans un plus grand rectangle appelé la BOX, tout cela sans chevauchement. 
+    Si l'on souhaite que la BOX soit 100% remplie des petits rectangles, alors on dit que l'on cherche un Perfect Rectangle Packing.
+    Vous avez la possibilité de choisir comment le résoudre : par vous-même, avec l'ordinateur aléatoirement, avec l'algorithme Depth First Search (DFS), ou bien avec l'algorithme Monte Carlo Search (MCS).
 
+    Premièrement, pour connaitre le probleme que vous allez résoudre, vous en choisirez un parmis une base de problème créée.
+    Puis, si vous décidez de le résoudre VOUS-MÊME, vous entrerez des coordonnees pour chaque rectangle à placer, elles feront références à la position du coin haut gauche de ce petit rectangle.
+    Le x à renseigner fait référence à l'axe des abscisses (l'axe L), et le y lui à l'axe des ordonnées (l'axe H).
 
+    Bonne chance ! """) 
+            main()
+    quit = input("\n    Voulez vous quitter ? (Oui ou Non) : ")
+    while quit == 'Non' and quit=='NON' and quit=='non' and quit=='oui' and quit=='Oui' and quit=='OUI':
+        print("!!!!Vous n'avez pas tapé une des réponses autorisées!!!!")
+    if quit == 'Non' or quit=='NON' or quit=='non' :
+        os.system('cls' if os.name == 'nt' else 'clear')
+        main()
+    else:
+        exit()
+        
 
 if __name__=="__main__":
      main()
