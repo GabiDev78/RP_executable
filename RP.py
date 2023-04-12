@@ -268,6 +268,8 @@ def main_player():
                r=small_rectangles_place.pop()
                small_rectangles.append(r)
                g.update_by_rect(r.y, r.x, r.height, r.width, 0)
+               os.system('cls' if os.name == 'nt' else 'clear')
+               continue
             else :
                 s = input("          Si vous voulez quitter tapez STOP sinon rien : ")
                 if s=='STOP' or s=='stop' :
@@ -723,7 +725,7 @@ def main_dfs():
 def mcs(rectangles, big_rectangle, grid, n, pb):
     os.system('cls' if os.name == 'nt' else 'clear')
     print("Problème : "+pb+" en cours d'execution par MCS")
-    print("La résolution du problème a commencé, cela peut prendre du temps, jusqu'à %s secondes !" % float(float(len(rectangles))*float(len(rectangles))*float(n)*0.1))
+    print("La résolution du problème a commencé, cela peut prendre du temps, jusqu'à %s secondes !" % float((float(len(rectangles))*(((float(len(rectangles)-1))*float(n)*0.1)/2))))
 
     placed_rectangles = []
     remaining_rectangles = copy.deepcopy(rectangles)
@@ -768,7 +770,27 @@ def get_resource_path(relative_path):
 
 
 def main_mcs():
-    fichier, namefich = choosefile()
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("\n\t******** MCS ********\n")
+    print("\t Comme MCS est un algorithme prenant relativement du temps, veuillez renseigner une difficulté :")
+    while True :
+        try :
+            diff = int(input("\t Tapez 1 pour un problème à résolution rapide par MCS ou 2 pour un problème plus complexe par MCS"))
+            break
+        except ValueError :
+            print("\t!!!!Vous n'avez pas tapé un entier!!!!")
+    while diff<1 or diff>6:
+        print("\t!!!!Vous n'avez pas tapé un entier entre 1 et 2!!!!")
+        while True :
+            try :
+                diff = input("\t Tapez 1 pour un problème à résolution rapide par MCS ou 2 pour un problème plus complexe par MCS")
+                break
+            except ValueError :
+                print("!!!!Vous n'avez pas tapé un entier!!!!")
+    if diff==1:
+        fichier, namefich = choosefile(1)
+    else:
+        fichier, namefich = choosefile(2)
     small_rectangles = []
     try:
         with open(fichier) as f:
@@ -789,14 +811,17 @@ def main_mcs():
                 g2.update_by_rect(rect.y, rect.x, rect.height, rect.width, i+1)
                 print(g2)
             print("densité finale : "+ str(c))
-            print("Problème : "+namefich+" effectué en %s secondes :" % end_time)
+            print("Problème : "+namefich+" effectué en : %s secondes " % end_time)
             print("")
     except Exception as e:
         print("Error:", e)
 
 
-def choosefile():
-    doss = random.randint(1,7)
+def choosefile(x):
+    if x==1:
+        doss = 1
+    else:
+        doss = random.randint(2,7)
     namefich = None
     if doss == 1:
         fichint = random.randint(1,10)
