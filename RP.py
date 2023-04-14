@@ -458,8 +458,9 @@ def main_random():
     g.CalcDensity()
 
 def main_random():
-    #Choisi un probleme au hasard parmis 3 fichiers
-    fichier, namefich = choosefile()
+    #Choisi un probleme au hasard parmis la base de fichiers
+    x = random.randint(1,2)
+    fichier, namefich = choosefile(x)
     small_rectangles = []
     small_rectangles_place = []
     with open(fichier) as f: #On recupere les valeurs du fichiers pour creer les objets pour les probleme
@@ -697,7 +698,8 @@ def dfs(rectangles, big_rectangle, rectangles_placed, grid, placed_indices):
 
 
 def main_dfs():
-    fichier, namefich = choosefile()
+    x = random.randint(1,2)
+    fichier, namefich = choosefile(x)
     small_rectangles = []
     small_rectangles_place = []
     placed_indices = []
@@ -779,14 +781,14 @@ def main_mcs():
             break
         except ValueError :
             print("\t!!!!Vous n'avez pas tapé un entier!!!!")
-    while diff<1 or diff>6:
+    while diff<1 or diff>2:
         print("\t!!!!Vous n'avez pas tapé un entier entre 1 et 2!!!!")
         while True :
             try :
-                diff = input("\t Tapez 1 pour un problème à résolution rapide par MCS ou 2 pour un problème plus complexe par MCS")
+                diff = int(input("\t Tapez 1 pour un problème à résolution rapide par MCS ou 2 pour un problème plus complexe par MCS"))
                 break
             except ValueError :
-                print("!!!!Vous n'avez pas tapé un entier!!!!")
+                print("\t!!!!Vous n'avez pas tapé un entier!!!!")
     if diff==1:
         fichier, namefich = choosefile(1)
     else:
